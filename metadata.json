@@ -1,0 +1,5 @@
+{
+  "name": "Lumina Journal",
+  "description": "A reflective reading journal powered by Gemini AI to track books, articles, and substacks.",
+  "requestFramePermissions": []
+}
