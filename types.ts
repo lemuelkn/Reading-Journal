@@ -16,6 +16,7 @@ export interface JournalEntry {
   url?: string;
   tags: string[];
   ai_summary?: string;
+  cover_image?: string;
   created_at: string;
   updated_at?: string;
 }
@@ -28,6 +29,7 @@ export interface EntryFormData {
   url: string;
   tags: string[];
   ai_summary: string;
+  cover_image?: string;
 }
 
 export interface AiAnalysisResult {

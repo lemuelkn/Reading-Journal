@@ -16,4 +16,10 @@ export const isSupabaseConfigured = () => {
 const clientUrl = isDemoMode ? 'https://demo.supabase.co' : supabaseUrl;
 const clientKey = isDemoMode ? 'demo-key' : supabaseAnonKey;
 
+if (isDemoMode) {
+  console.log("⚠️ Lumina is running in DEMO MODE (Local Storage). Add Supabase keys to .env to go live.");
+} else {
+  console.log("✅ Lumina is connected to Supabase Backend.");
+}
+
 export const supabase = createClient(clientUrl, clientKey);

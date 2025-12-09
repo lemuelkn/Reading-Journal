@@ -1,6 +1,7 @@
 import React from 'react';
 import { JournalEntry, EntryType } from '../types';
-import { Button } from './Button';
+import { marked } from 'marked';
+import DOMPurify from 'dompurify';
 
 interface EntryListProps {
   entries: JournalEntry[];
@@ -18,7 +19,7 @@ const TypeBadge: React.FC<{ type: EntryType }> = ({ type }) => {
   };
 
   return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] uppercase tracking-widest font-bold border ${colors[type] || colors[EntryType.OTHER]}`}>
+    <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] uppercase tracking-widest font-bold border ${colors[type] || colors[EntryType.OTHER]}`}>
       {type}
     </span>
   );
@@ -34,50 +35,73 @@ export const EntryList: React.FC<EntryListProps> = ({ entries, onEdit, onDelete 
     );
   }
 
+  // Function to render markdown content
+  const renderContent = (content: string) => {
+    // Convert markdown to HTML
+    const rawHtml = marked.parse(content) as string;
+    // Sanitize HTML to prevent XSS
+    const cleanHtml = DOMPurify.sanitize(rawHtml);
+    
+    return { __html: cleanHtml };
+  };
+
   return (
-    // Increased grid columns for smaller tiles: lg:3, xl:4
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    // Increased grid columns significantly: sm:2, md:3, lg:4, xl:5 for smaller cards
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
       {entries.map(entry => (
         <div key={entry.id} className="group bg-white rounded-sm shadow-sm border border-stone-200 overflow-hidden flex flex-col hover:shadow-md transition-all duration-300 hover:-translate-y-1">
           
-          <div className="p-5 flex-1 flex flex-col">
-            <div className="flex justify-between items-start mb-3">
+          <div className="p-4 flex-1 flex flex-col">
+            <div className="flex justify-between items-start mb-2">
               <TypeBadge type={entry.type} />
             </div>
             
-            <h3 className="text-lg font-bold text-stone-900 mb-1 font-serif leading-tight line-clamp-2">
-              {entry.title}
-            </h3>
-
-            {entry.author && (
-              <p className="text-xs text-stone-500 mb-3 font-sans uppercase tracking-wide">
-                {entry.author}
-              </p>
-            )}
+            <div className="flex gap-3 mb-2">
+               {/* Cover Image if available */}
+               {entry.cover_image && (
+                 <div className="flex-shrink-0">
+                    <img src={entry.cover_image} alt={`Cover of ${entry.title}`} className="w-12 h-auto object-cover shadow-sm border border-stone-100 rounded-sm" />
+                 </div>
+               )}
+               
+               <div>
+                  <h3 className="text-base font-bold text-stone-900 mb-0.5 font-serif leading-tight line-clamp-2">
+                    {entry.title}
+                  </h3>
+                  {entry.author && (
+                    <p className="text-[10px] text-stone-500 font-sans uppercase tracking-wide">
+                      {entry.author}
+                    </p>
+                  )}
+               </div>
+            </div>
             
-            <div className="w-8 h-px bg-stone-200 mb-3"></div>
+            <div className="w-6 h-px bg-stone-200 mb-2"></div>
 
-            <p className="text-stone-600 text-sm line-clamp-6 mb-4 whitespace-pre-wrap font-serif flex-grow leading-relaxed">
-              {entry.content}
-            </p>
+            {/* Markdown Content Container */}
+            <div 
+              className="text-stone-600 text-xs line-clamp-4 mb-3 font-serif flex-grow leading-relaxed prose prose-stone prose-sm max-w-none 
+                         [&>p]:mb-1 [&>ul]:list-disc [&>ul]:pl-4 [&>ol]:list-decimal [&>ol]:pl-4 [&>blockquote]:border-l-2 [&>blockquote]:border-stone-300 [&>blockquote]:pl-3 [&>blockquote]:italic [&>h1]:font-bold [&>h1]:text-stone-800 [&>h2]:font-bold [&>h2]:text-stone-700"
+              dangerouslySetInnerHTML={renderContent(entry.content)}
+            />
 
-            <div className="flex flex-wrap gap-1 mt-auto pt-3">
+            <div className="flex flex-wrap gap-1 mt-auto pt-2">
               {entry.tags?.slice(0, 3).map(tag => (
-                <span key={tag} className="text-[10px] text-stone-500 bg-stone-50 px-1.5 py-0.5 rounded border border-stone-100">#{tag}</span>
+                <span key={tag} className="text-[9px] text-stone-500 bg-stone-50 px-1.5 py-0.5 rounded border border-stone-100">#{tag}</span>
               ))}
               {entry.tags && entry.tags.length > 3 && (
-                <span className="text-[10px] text-stone-400 px-1.5 py-0.5">+{entry.tags.length - 3}</span>
+                <span className="text-[9px] text-stone-400 px-1.5 py-0.5">+{entry.tags.length - 3}</span>
               )}
             </div>
           </div>
           
-          <div className="px-5 py-3 border-t border-stone-100 flex justify-between items-center bg-stone-50/50">
+          <div className="px-4 py-2 border-t border-stone-100 flex justify-between items-center bg-stone-50/50">
              <span className="text-[10px] text-stone-400 font-sans">
               {new Date(entry.created_at).toLocaleDateString()}
             </span>
             <div className="flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-              <button className="text-xs text-stone-500 hover:text-stone-900 px-2 py-1 rounded hover:bg-stone-100" onClick={() => onEdit(entry)}>Edit</button>
-              <button className="text-xs text-red-400 hover:text-red-700 px-2 py-1 rounded hover:bg-red-50" onClick={() => onDelete(entry.id)}>Delete</button>
+              <button className="text-[10px] text-stone-500 hover:text-stone-900 px-2 py-1 rounded hover:bg-stone-100" onClick={() => onEdit(entry)}>Edit</button>
+              <button className="text-[10px] text-red-400 hover:text-red-700 px-2 py-1 rounded hover:bg-red-50" onClick={() => onDelete(entry.id)}>Delete</button>
             </div>
           </div>
         </div>

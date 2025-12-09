@@ -6,7 +6,9 @@ Lumina Journal is a personal knowledge management app designed for avid readers.
 
 *   **User Authentication:** Secure Passwordless Login via Supabase Magic Links.
 *   **CRUD Operations:** Create, Read, Update, and Delete journal entries.
-*   **AI Integration:** Uses Gemini 2.5 Flash to analyze your reading notes, providing a 1-sentence summary and auto-tags.
+*   **Book Search:** Integrated with Open Library API to auto-fill book titles, authors, and cover images.
+*   **Rich Text:** Markdown support for bold, italics, lists, and quotes.
+*   **AI Integration:** Uses Gemini 2.5 Flash to analyze your reading notes (currently in v2 planning).
 *   **Categorization:** Organize by Books, Articles, Substacks, and Research Papers.
 *   **Responsive Design:** Optimized for desktop and mobile using Tailwind CSS.
 
@@ -37,6 +39,7 @@ create table entries (
   url text,
   tags text[] default '{}',
   ai_summary text,
+  cover_image text,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null,
   updated_at timestamp with time zone default timezone('utc'::text, now())
 );
@@ -91,13 +94,11 @@ If you see the "Configuration Required" screen:
 2.  **Dashboard:** Once logged in, you will see your "Reading Log". It might be empty at first.
 3.  **Adding an Entry:**
     *   Click the **+ New Entry** button.
-    *   Select the type (Book, Article, etc.).
-    *   Add the title, author, and the URL (optional).
-    *   **The Magic Part:** Paste your notes, quotes, or thoughts into the "Notes" section.
-    *   Click **✨ Analyze & Tag with Gemini**. The AI will read your notes, generate a short summary, and suggest tags.
-    *   **Suggested Tags:** Click on any of the suggested tags to quickly add them.
-    *   Click **Save Entry**.
-4.  **Reviewing:** You can scroll through your dashboard to see everything you've read. The AI summary helps you quickly recall what a specific article was about without re-reading all your notes.
+    *   **Book Search:** Select "Book" as the type. Type the title, and a list of matching books will appear. Select one to auto-fill the author and cover image.
+    *   **Writing:** Write your thoughts in the text area. Use the toolbar to add **Bold**, *Italics*, or Quotes.
+    *   **Tags:** Add tags manually or click the suggestions.
+    *   Click **Save to Journal**.
+4.  **Reviewing:** Scroll through your library. You can filter by tags or search for specific keywords.
 
 ### Deployment to Vercel
 
