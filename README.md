@@ -8,7 +8,7 @@ Lumina Journal is a personal knowledge management app designed for avid readers.
 *   **CRUD Operations:** Create, Read, Update, and Delete journal entries.
 *   **Book Search:** Integrated with Open Library API to auto-fill book titles, authors, and cover images.
 *   **Rich Text:** Markdown support for bold, italics, lists, and quotes.
-*   **AI Integration:** Uses Gemini 2.5 Flash to analyze your reading notes (currently in v2 planning).
+*   **AI Integration:** Uses Gemini 2.5 Flash to analyze your reading notes.
 *   **Categorization:** Organize by Books, Articles, Substacks, and Research Papers.
 *   **Responsive Design:** Optimized for desktop and mobile using Tailwind CSS.
 
@@ -19,7 +19,7 @@ Lumina Journal is a personal knowledge management app designed for avid readers.
 *   **Frontend:** React 18, TypeScript, Tailwind CSS (via CDN for simplicity in this environment).
 *   **Backend:** Supabase (PostgreSQL + Auth).
 *   **AI:** Google Gemini API (`gemini-2.5-flash`).
-*   **Hosting:** Vercel (Recommended).
+*   **Hosting:** Vercel.
 
 ### Database Schema (Supabase)
 
@@ -70,40 +70,40 @@ using (auth.uid() = user_id);
 
 ### Environment Variables
 
-Create a `.env` file in the root directory (or configure in Vercel):
+To run the app locally, create a `.env` file in the root directory.
+**Important:** Variables must start with `VITE_` to be visible to the browser application.
 
-```
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-API_KEY=your_google_gemini_api_key
+```bash
+VITE_SUPABASE_URL=your_supabase_project_url
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+VITE_GEMINI_API_KEY=your_google_gemini_api_key
 ```
 
-*Note: If using Create React App standard scripts, prefix with `REACT_APP_` instead of `NEXT_PUBLIC_`.*
+## Deployment Guide (Vercel)
+
+### 1. Deploy the Code
+1.  Push this code to a GitHub repository.
+2.  Login to **Vercel** and click **"Add New Project"**.
+3.  Import your GitHub repository.
+4.  In the **Environment Variables** section, add the keys:
+    *   `VITE_SUPABASE_URL`
+    *   `VITE_SUPABASE_ANON_KEY`
+    *   `VITE_GEMINI_API_KEY`
+5.  Click **Deploy**.
+
+### 2. Configure Supabase Redirects (CRITICAL)
+For Magic Links to work on your live site, Supabase needs to know your Vercel URL.
+
+1.  Wait for Vercel to finish deploying. Copy your new domain (e.g., `https://lumina-journal.vercel.app`).
+2.  Go to your **Supabase Dashboard**.
+3.  Navigate to **Authentication** > **URL Configuration**.
+4.  In **Site URL**, paste your Vercel domain.
+5.  In **Redirect URLs**, add your Vercel domain (e.g., `https://lumina-journal.vercel.app/**`).
+6.  Click **Save**.
 
 **Troubleshooting:**
-If you see the "Configuration Required" screen:
-1. Ensure you have created the `.env` file.
-2. If hosting on **Vercel**, go to **Settings > Environment Variables** and add the keys there.
-3. Ensure you restart your development server after adding new variables.
 
-## Non-Technical Documentation
-
-### How to Use
-
-1.  **Log In:** Enter your email address. You will receive a "Magic Link" in your inbox. Click it to sign in without a password.
-2.  **Dashboard:** Once logged in, you will see your "Reading Log". It might be empty at first.
-3.  **Adding an Entry:**
-    *   Click the **+ New Entry** button.
-    *   **Book Search:** Select "Book" as the type. Type the title, and a list of matching books will appear. Select one to auto-fill the author and cover image.
-    *   **Writing:** Write your thoughts in the text area. Use the toolbar to add **Bold**, *Italics*, or Quotes.
-    *   **Tags:** Add tags manually or click the suggestions.
-    *   Click **Save to Journal**.
-4.  **Reviewing:** Scroll through your library. You can filter by tags or search for specific keywords.
-
-### Deployment to Vercel
-
-1.  Push this code to a GitHub repository.
-2.  Login to Vercel and "Add New Project".
-3.  Select your repository.
-4.  In the **Environment Variables** section, add the keys mentioned in the Technical section above.
-5.  Click **Deploy**.
+**Error: "Forbidden use of secret API key in browser"**
+This happens if you accidentally used the `service_role` (secret) key instead of the `anon` (public) key in your Vercel Environment Variables.
+1. Check Vercel Project Settings > Environment Variables.
+2. Ensure `VITE_SUPABASE_ANON_KEY` is the `anon` (public) key from Supabase.

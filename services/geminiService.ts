@@ -1,19 +1,11 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { AiAnalysisResult } from "../types";
 
-const apiKey = process.env.API_KEY || '';
-
-let genAI: GoogleGenAI | null = null;
-
-if (apiKey) {
-  genAI = new GoogleGenAI({ apiKey: apiKey });
-}
+// Initialize the Google GenAI client with the API key from process.env
+// The API key must be obtained exclusively from process.env.API_KEY
+const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 export const analyzeEntry = async (text: string, title: string): Promise<AiAnalysisResult> => {
-  if (!genAI) {
-    throw new Error("Gemini API Key is missing. Please check your environment variables.");
-  }
-
   // We use the flash model for fast, cost-effective text analysis
   const modelId = 'gemini-2.5-flash';
 
@@ -28,7 +20,7 @@ export const analyzeEntry = async (text: string, title: string): Promise<AiAnaly
   `;
 
   try {
-    const response = await genAI.models.generateContent({
+    const response = await ai.models.generateContent({
       model: modelId,
       contents: prompt,
       config: {

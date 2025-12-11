@@ -31,6 +31,35 @@ export const isSupabaseConfigured = () => {
 const clientUrl = isDemoMode ? 'https://demo.supabase.co' : supabaseUrl;
 const clientKey = isDemoMode ? 'demo-key' : supabaseAnonKey;
 
+// --- Safety Check for Service Role Key ---
+if (!isDemoMode && clientKey) {
+  try {
+    // Check if the key looks like a JWT
+    const parts = clientKey.split('.');
+    if (parts.length === 3) {
+      // Decode JWT payload (Base64Url -> Base64)
+      const base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+      const payload = JSON.parse(atob(base64));
+      
+      if (payload.role === 'service_role') {
+        console.error(`
+          \n
+          🔴 CRITICAL CONFIGURATION ERROR 🔴
+          You are using the Supabase "service_role" (secret) key in the browser.
+          This is a security risk and causes the "Forbidden use of secret API key" error.
+          
+          Please update your .env file:
+          VITE_SUPABASE_ANON_KEY should contain the "anon" (public) key found in:
+          Supabase Dashboard -> Settings -> API -> Project API keys
+          \n
+        `);
+      }
+    }
+  } catch (e) {
+    // Silently ignore parsing errors and let Supabase client handle validation
+  }
+}
+
 if (isDemoMode) {
   console.log("⚠️ Lumina is running in DEMO MODE (Local Storage)."); 
   console.log("👉 To go live, add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to your .env file and restart.");
