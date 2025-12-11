@@ -79,11 +79,17 @@ export const EntryList: React.FC<EntryListProps> = ({ entries, onEdit, onDelete 
             <div className="w-6 h-px bg-stone-200 mb-2"></div>
 
             {/* Markdown Content Container */}
-            <div 
-              className="text-stone-600 text-xs line-clamp-4 mb-3 font-serif flex-grow leading-relaxed prose prose-stone prose-sm max-w-none 
-                         [&>p]:mb-1 [&>ul]:list-disc [&>ul]:pl-4 [&>ol]:list-decimal [&>ol]:pl-4 [&>blockquote]:border-l-2 [&>blockquote]:border-stone-300 [&>blockquote]:pl-3 [&>blockquote]:italic [&>h1]:font-bold [&>h1]:text-stone-800 [&>h2]:font-bold [&>h2]:text-stone-700"
-              dangerouslySetInnerHTML={renderContent(entry.content)}
-            />
+            {entry.ai_summary ? (
+              <div className="text-stone-600 text-xs line-clamp-4 mb-3 font-serif flex-grow leading-relaxed italic">
+                 {entry.ai_summary}
+              </div>
+            ) : (
+              <div 
+                className="text-stone-600 text-xs line-clamp-4 mb-3 font-serif flex-grow leading-relaxed prose prose-stone prose-sm max-w-none 
+                           [&>p]:mb-1 [&>ul]:list-disc [&>ul]:pl-4 [&>ol]:list-decimal [&>ol]:pl-4"
+                dangerouslySetInnerHTML={renderContent(entry.content)}
+              />
+            )}
 
             <div className="flex flex-wrap gap-1 mt-auto pt-2">
               {entry.tags?.slice(0, 3).map(tag => (

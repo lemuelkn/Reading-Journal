@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { EntryFormData, EntryType, JournalEntry } from '../types';
 import { Button } from './Button';
+import { analyzeEntry } from '../services/geminiService';
 
 interface EntryFormProps {
   initialData?: JournalEntry;
@@ -33,6 +34,7 @@ export const EntryForm: React.FC<EntryFormProps> = ({ initialData, onSubmit, onC
     cover_image: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
   
   // Search State
   const [searchResults, setSearchResults] = useState<BookSearchResult[]>([]);
@@ -64,6 +66,32 @@ export const EntryForm: React.FC<EntryFormProps> = ({ initialData, onSubmit, onC
       await onSubmit(formData);
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleAiAnalysis = async () => {
+    if (!formData.content || formData.content.length < 10) {
+      alert("Please write a bit more content before analyzing.");
+      return;
+    }
+    
+    setIsAnalyzing(true);
+    try {
+      const result = await analyzeEntry(formData.content, formData.title);
+      
+      // Merge new tags with existing ones, avoiding duplicates
+      const newTags = [...new Set([...formData.tags, ...result.tags])];
+      
+      setFormData(prev => ({
+        ...prev,
+        ai_summary: result.summary,
+        tags: newTags
+      }));
+    } catch (error) {
+      console.error("AI Analysis failed", error);
+      alert("Could not complete AI analysis. Please check your API key.");
+    } finally {
+      setIsAnalyzing(false);
     }
   };
 
@@ -299,8 +327,38 @@ export const EntryForm: React.FC<EntryFormProps> = ({ initialData, onSubmit, onC
           />
         </div>
 
+        {/* AI Analysis Section */}
+        <div className="bg-stone-50 p-4 rounded-sm border border-stone-100">
+           <div className="flex justify-between items-center mb-2">
+             <label className="text-xs font-bold text-stone-400 uppercase tracking-widest">AI Summary & Tags</label>
+             <button 
+               type="button" 
+               onClick={handleAiAnalysis}
+               disabled={isAnalyzing}
+               className="text-xs flex items-center gap-1 bg-white border border-stone-300 px-2 py-1 rounded-sm text-stone-600 hover:text-stone-900 hover:border-stone-400 transition-all shadow-sm"
+             >
+               {isAnalyzing ? (
+                 <>
+                   <span className="animate-spin">⏳</span> Analyzing...
+                 </>
+               ) : (
+                 <>
+                   <span>✨</span> Analyze Notes
+                 </>
+               )}
+             </button>
+           </div>
+           <textarea 
+             value={formData.ai_summary}
+             onChange={e => setFormData({...formData, ai_summary: e.target.value})}
+             rows={3}
+             className="w-full text-sm bg-white border border-stone-200 rounded-sm p-2 text-stone-600 font-serif italic focus:ring-stone-200 focus:border-stone-300"
+             placeholder="Click 'Analyze Notes' to generate a summary automatically..."
+           />
+        </div>
+
         {/* Footer Section: Metadata (URL, Tags) */}
-        <div className="pt-6 border-t border-stone-100 space-y-5">
+        <div className="space-y-5">
           
           {/* URL Input */}
           <div>
@@ -354,7 +412,7 @@ export const EntryForm: React.FC<EntryFormProps> = ({ initialData, onSubmit, onC
         </div>
 
         {/* Actions */}
-        <div className="flex justify-between items-center pt-4">
+        <div className="flex justify-between items-center pt-4 border-t border-stone-100">
            <span className="text-xs text-stone-400 font-sans italic">
              {initialData ? 'Editing entry...' : 'New entry...'}
            </span>

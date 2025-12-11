@@ -26,6 +26,9 @@ export const Auth: React.FC<AuthProps> = ({ onDemoLogin }) => {
     }
 
     try {
+      // Debug log to verify the redirect URL being sent to Supabase
+      console.log('Sending Magic Link with redirect URL:', window.location.origin);
+
       // Use Magic Link (OTP) for login
       const { error } = await supabase.auth.signInWithOtp({
         email,

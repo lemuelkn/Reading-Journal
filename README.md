@@ -81,29 +81,33 @@ VITE_GEMINI_API_KEY=your_google_gemini_api_key
 
 ## Deployment Guide (Vercel)
 
-### 1. Deploy the Code
-1.  Push this code to a GitHub repository.
-2.  Login to **Vercel** and click **"Add New Project"**.
-3.  Import your GitHub repository.
-4.  In the **Environment Variables** section, add the keys:
+Connecting your app involves two main steps: telling Vercel about your keys, and telling Supabase about your Vercel URL.
+
+### Step 1: Tell Vercel about Supabase (Environment Variables)
+1.  Push your code to GitHub.
+2.  Import the project into Vercel.
+3.  In Vercel **Settings** > **Environment Variables**, add:
     *   `VITE_SUPABASE_URL`
     *   `VITE_SUPABASE_ANON_KEY`
     *   `VITE_GEMINI_API_KEY`
-5.  Click **Deploy**.
+4.  **Redeploy** if you added these after the initial build.
 
-### 2. Configure Supabase Redirects (CRITICAL)
-For Magic Links to work on your live site, Supabase needs to know your Vercel URL.
+### Step 2: Tell Supabase about Vercel (URL Configuration)
+**Critical for Magic Links:** If you skip this, users will be redirected to localhost and login will fail.
 
-1.  Wait for Vercel to finish deploying. Copy your new domain (e.g., `https://lumina-journal.vercel.app`).
-2.  Go to your **Supabase Dashboard**.
-3.  Navigate to **Authentication** > **URL Configuration**.
-4.  In **Site URL**, paste your Vercel domain.
-5.  In **Redirect URLs**, add your Vercel domain (e.g., `https://lumina-journal.vercel.app/**`).
-6.  Click **Save**.
+1.  Copy your Vercel domain (e.g., `https://lumina-journal.vercel.app`).
+2.  Go to your **Supabase Dashboard** > **Authentication** > **URL Configuration**.
+3.  **Site URL:** Paste your Vercel domain.
+4.  **Redirect URLs:** Add your Vercel domain with a wildcard to ensure deep links work.
+    *   Example: `https://lumina-journal.vercel.app/**`
+5.  Click **Save**.
 
-**Troubleshooting:**
+### Troubleshooting
 
-**Error: "Forbidden use of secret API key in browser"**
-This happens if you accidentally used the `service_role` (secret) key instead of the `anon` (public) key in your Vercel Environment Variables.
-1. Check Vercel Project Settings > Environment Variables.
-2. Ensure `VITE_SUPABASE_ANON_KEY` is the `anon` (public) key from Supabase.
+**Error: "Forbidden use of secret API key"**
+*   **Cause:** You used the `service_role` key in Vercel instead of the `anon` key.
+*   **Fix:** Go to Vercel Environment Variables, edit `VITE_SUPABASE_ANON_KEY`, and replace it with the `anon` (public) key from Supabase.
+
+**Magic Link redirects to localhost**
+*   **Cause:** Step 2 (URL Configuration) was skipped.
+*   **Fix:** Ensure your Vercel URL is listed in the Supabase Redirect URLs.
