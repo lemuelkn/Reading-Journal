@@ -3,9 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 // Helper to access environment variables in Vite or standard environments
 const getEnvVar = (key: string) => {
   // Check Vite (import.meta.env)
-  // @ts-ignore
   if (typeof import.meta !== 'undefined' && import.meta.env) {
-    // @ts-ignore
     return import.meta.env[key] || '';
   }
   // Check Process (Node/CRA/Next)

@@ -14,6 +14,9 @@ interface ImportMeta {
 // This avoids "Cannot redeclare block-scoped variable 'process'" errors.
 declare namespace NodeJS {
   interface ProcessEnv {
+    // ⚠️ DO NOT PASTE YOUR API KEY HERE ⚠️
+    // This is just a type definition telling TypeScript that "API_KEY" exists.
+    // To set the actual value, create a .env file and add: VITE_GEMINI_API_KEY=your_key
     API_KEY: string;
   }
 }
