@@ -12,7 +12,8 @@ export default defineConfig(({ mode }) => {
     define: {
       // The Google GenAI SDK expects process.env.API_KEY to be available.
       // We map it to the VITE_GEMINI_API_KEY environment variable here.
-      'process.env.API_KEY': JSON.stringify(env.VITE_GEMINI_API_KEY),
+      // Added || '' to ensure it doesn't crash if the key is missing.
+      'process.env.API_KEY': JSON.stringify(env.VITE_GEMINI_API_KEY || ''),
     }
   }
 })
